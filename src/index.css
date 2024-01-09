@@ -1,0 +1,81 @@
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 16px;
+    background-color: #f8f8f8;
+    color: #333;
+}
+
+/* Container styles */
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Autocomplete component styles */
+.autocomplete {
+    position: relative;
+}
+
+.autocomplete input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.autocomplete-result-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.autocomplete-result-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* Loading and error messages */
+.message {
+    padding: 10px;
+    text-align: center;
+}
+
+.error-message {
+    color: red;
+}
+
+/* Additional global styles */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Utility classes */
+.hidden {
+    display: none;
+}

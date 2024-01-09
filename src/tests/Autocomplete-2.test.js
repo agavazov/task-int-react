@@ -1,21 +1,24 @@
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
-import axios from 'axios';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import Autocomplete from '../components/Autocomplete/Autocomplete';
 
-jest.mock('axios');
-
-describe('Autocomplete - Network Interaction', () => {
-  test('displays loading state during data fetching', async () => {
-    const mockResponse = { data: { items: [] } };
-    axios.get.mockResolvedValueOnce(mockResponse);
+describe('Autocomplete - AbortController', () => {
+  test('cancels ongoing fetch request on new input', async () => {
+    const abortSpy = jest.fn();
+    global.AbortController = jest.fn().mockImplementation(() => {
+      return { signal: {}, abort: abortSpy };
+    });
 
     render(<Autocomplete />);
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'react' } });
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-    await waitFor(() => expect(axios.get).toHaveBeenCalled());
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'first' } });
+    fireEvent.change(input, { target: { value: 'second' } });
+
+    expect(abortSpy).toHaveBeenCalledTimes(2); // Expect abort to have been called more than once
+
+    global.AbortController.mockRestore();
   });
-
-  // Additional tests for network success and failure cases
 });
+

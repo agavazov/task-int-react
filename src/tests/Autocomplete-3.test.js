@@ -1,28 +1,35 @@
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
-import axios from 'axios';
-import Autocomplete from '../components/Autocomplete/Autocomplete';
+import { render, act } from '@testing-library/react';
+import useDebounce from '../hooks/useDebounce';
 
-jest.mock('axios');
+function TestComponent({ callback, delay }) {
+  const debouncedCallback = useDebounce(callback, delay);
+  return <button onClick={() => debouncedCallback('test')}>Test</button>;
+}
 
-describe('Autocomplete - Displaying Results', () => {
-  test('shows results when fetched from the API', async () => {
-    const mockResponse = { data: { items: [{ full_name: 'facebook/react' }, { full_name: 'vuejs/vue' }] } };
-    axios.get.mockResolvedValueOnce(mockResponse);
+test('useDebounce hook delays the function call', () => {
+  jest.useFakeTimers();
+  const mockCallback = jest.fn();
+  const delay = 500;
 
-    render(<Autocomplete />);
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'js' } });
+  const { getByText } = render(<TestComponent callback={mockCallback} delay={delay} />);
+  const button = getByText('Test');
 
-    await waitFor(() => expect(screen.getByText('facebook/react')).toBeInTheDocument());
-    expect(screen.getByText('vuejs/vue')).toBeInTheDocument();
+  // Simulate rapid button clicks
+  act(() => {
+    button.click();
+    button.click();
+    button.click();
   });
 
-  test('shows no results message when API returns empty array', async () => {
-    axios.get.mockResolvedValueOnce({ data: { items: [] } });
-
-    render(<Autocomplete />);
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'unknownquery' } });
-
-    await waitFor(() => expect(screen.getByText('No results found')).toBeInTheDocument());
+  // Fast-forward time
+  act(() => {
+    jest.advanceTimersByTime(delay);
   });
+
+  // Expect the callback to be called only once
+  expect(mockCallback).toHaveBeenCalledTimes(1);
+  expect(mockCallback).toHaveBeenCalledWith('test');
+
+  jest.useRealTimers();
 });
